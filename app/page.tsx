@@ -135,7 +135,7 @@ export default function Home() {
         </PromptInput>
       </div>
 
-      <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
+      <div className="px-4 pb-4 text-xs text-muted-foreground text-right">
         Gemini 2.5 Flash
       </div>
     </div>
