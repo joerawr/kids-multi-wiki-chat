@@ -1,0 +1,59 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+.env.local
+
+# MCP documentation files
+l3-n0x-minecraft-wiki-mcp-8a5edab282632443.txt
+professionalwiki-mediawiki-mcp-server-8a5edab282632443.txt
+rudra-ravi-wikipedia-mcp-8a5edab282632443.txt
+2025-09-16-read-planningmd-for-the-natural-language-planning.txt
+
+# project planning notes
+Planning.md
+planning.md
+summary.md
+Summary.md
+progress.md
+
+# Gemini, Claude, OpenAI, etc
+.claude/
