@@ -23,6 +23,7 @@ export class MCPManager extends EventEmitter {
   private messageQueue: MCPMessage[] = [];
   private pendingRequests = new Map<string | number, { resolve: Function, reject: Function }>();
   private requestId = 0;
+  private isInitialized = false;
 
   private serverConfigs: Record<string, MCPServerConfig> = {
     minecraft: {
@@ -39,8 +40,8 @@ export class MCPManager extends EventEmitter {
     },
     wikipedia: {
       name: 'Wikipedia',
-      command: 'mcp-servers/wikipedia/venv/bin/wikipedia-mcp',
-      args: ['--country', 'US'],
+      command: 'mcp-servers/wikipedia/venv/bin/python3',
+      args: ['-m', 'wikipedia_mcp', '--country', 'US'],
       cwd: process.cwd()
     }
   };
@@ -65,6 +66,7 @@ export class MCPManager extends EventEmitter {
       });
 
       this.activeServer = serverName;
+      this.isInitialized = false;
 
       this.activeProcess.stdout?.on('data', (data) => {
         this.handleMessage(data.toString());
@@ -84,6 +86,7 @@ export class MCPManager extends EventEmitter {
         console.log(`MCP ${serverName} exited with code:`, code);
         this.activeProcess = null;
         this.activeServer = null;
+        this.isInitialized = false;
         this.emit('exit', code);
       });
 
@@ -104,6 +107,12 @@ export class MCPManager extends EventEmitter {
         }
       }).then(() => {
         console.log(`MCP ${serverName} initialized successfully`);
+        this.sendNotification({
+          jsonrpc: '2.0',
+          method: 'notifications/initialized',
+          params: {}
+        });
+        this.isInitialized = true;
         resolve();
       }).catch(reject);
     });
@@ -117,6 +126,7 @@ export class MCPManager extends EventEmitter {
           this.activeProcess = null;
           this.activeServer = null;
           this.pendingRequests.clear();
+          this.isInitialized = false;
           resolve();
         });
       });
@@ -148,6 +158,9 @@ export class MCPManager extends EventEmitter {
   }
 
   async callTool(toolName: string, params: any): Promise<any> {
+    if (!this.isInitialized) {
+      throw new Error('MCP server not initialized');
+    }
     return this.sendMessage({
       jsonrpc: '2.0',
       id: this.generateRequestId(),
@@ -160,12 +173,26 @@ export class MCPManager extends EventEmitter {
   }
 
   async listTools(): Promise<any> {
+    if (!this.isInitialized) {
+      throw new Error('MCP server not initialized');
+    }
     return this.sendMessage({
       jsonrpc: '2.0',
       id: this.generateRequestId(),
       method: 'tools/list',
       params: {}
     });
+  }
+
+  private sendNotification(message: MCPMessage): void {
+    if (!this.activeProcess) {
+      throw new Error('No active MCP server');
+    }
+
+    const notification = { ...message };
+    delete notification.id;
+    const messageString = JSON.stringify(notification) + '\n';
+    this.activeProcess.stdin?.write(messageString);
   }
 
   private handleMessage(data: string): void {
