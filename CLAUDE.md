@@ -4,6 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
+### Setup (run once or when dependencies change)
+- `pnpm install` - Install Node.js dependencies
+- `git clone https://github.com/L3-N0X/Minecraft-Wiki-MCP.git mcp-servers/minecraft-wiki` - Clone Minecraft MCP server
+
+### Development
 - `pnpm dev` - Start development server with Turbopack
 - `pnpm build` - Build production app with Turbopack
 - `pnpm start` - Start production server
