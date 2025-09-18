@@ -1,13 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 export interface MCPServer {
   id: string;
@@ -16,24 +11,27 @@ export interface MCPServer {
   status: 'idle' | 'starting' | 'active' | 'error';
 }
 
-const MCP_SERVERS: MCPServer[] = [
+const MCP_SERVERS: (MCPServer & { imagePath: string })[] = [
   {
     id: 'minecraft',
     name: 'Minecraft',
     description: 'Minecraft Wiki content and information',
-    status: 'idle'
+    status: 'idle',
+    imagePath: '/Minecraft_pickaxe_256px.png'
   },
   {
     id: 'pokemon',
     name: 'Pokemon',
     description: 'Pokemon (Bulbapedia) content and information',
-    status: 'idle'
+    status: 'idle',
+    imagePath: '/pikachu_in_pokeball_256px.png'
   },
   {
     id: 'wikipedia',
     name: 'Wikipedia',
     description: 'Wikipedia articles and general knowledge',
-    status: 'idle'
+    status: 'idle',
+    imagePath: '/Wikipedia-logo-v2-256px.png'
   }
 ];
 
@@ -47,6 +45,17 @@ export function MCPSelector({ onServerChange, disabled = false }: MCPSelectorPro
   const [serverStatuses, setServerStatuses] = useState<Record<string, MCPServer['status']>>({});
   const [isChanging, setIsChanging] = useState(false);
 
+  const playClickSound = () => {
+    try {
+      const audio = new Audio('/Plastic-Button-Click.mp3');
+      audio.play().catch(() => {
+        // Ignore audio errors (e.g., user hasn't interacted with page yet)
+      });
+    } catch (error) {
+      // Ignore audio creation errors
+    }
+  };
+
   useEffect(() => {
     // Initialize server statuses
     const initialStatuses: Record<string, MCPServer['status']> = {};
@@ -59,6 +68,7 @@ export function MCPSelector({ onServerChange, disabled = false }: MCPSelectorPro
   const handleServerChange = async (serverId: string) => {
     if (isChanging || disabled) return;
 
+    playClickSound();
     setIsChanging(true);
 
     try {
@@ -139,40 +149,42 @@ export function MCPSelector({ onServerChange, disabled = false }: MCPSelectorPro
   };
 
   return (
-    <div className="flex items-center gap-3">
-      <label className="text-sm font-medium text-muted-foreground">
-        Wiki Source:
+    <div className="flex flex-col items-center gap-3">
+      <label className="text-sm font-sans font-medium text-muted-foreground">
+        Click a button to select a source:
       </label>
-      <Select
-        value={selectedServer || ""}
-        onValueChange={handleServerChange}
-        disabled={disabled || isChanging}
-      >
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Select a wiki source" />
-        </SelectTrigger>
-        <SelectContent>
-          {MCP_SERVERS.map((server) => (
-            <SelectItem key={server.id} value={server.id}>
-              <div className="flex items-center gap-2">
-                <span>{getStatusIndicator(server.id)}</span>
-                <span>{server.name}</span>
-                <span className="text-xs text-muted-foreground">
-                  ({getStatusText(server.id)})
-                </span>
+      <div className="flex gap-4">
+        {MCP_SERVERS.map((server) => (
+          <Button
+            key={server.id}
+            variant="ghost"
+            onClick={() => handleServerChange(server.id)}
+            disabled={disabled || isChanging}
+            className={`relative p-2 h-auto transition-all duration-200 hover:scale-105 active:scale-95 ${
+              selectedServer === server.id
+                ? 'ring-2 ring-green-400 bg-green-50 dark:bg-green-950/20'
+                : 'hover:bg-accent'
+            }`}
+            title={`${server.name} - ${getStatusText(server.id)}`}
+          >
+            <div className="flex flex-col items-center gap-1">
+              <div className="relative">
+                <Image
+                  src={server.imagePath}
+                  alt={server.name}
+                  width={64}
+                  height={64}
+                  className="rounded-lg"
+                />
+                <div className="absolute -top-1 -right-1 text-xs">
+                  {getStatusIndicator(server.id)}
+                </div>
               </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {selectedServer && (
-        <div className="text-sm text-muted-foreground">
-          Active: <span className="font-medium text-foreground">
-            {MCP_SERVERS.find(s => s.id === selectedServer)?.name}
-          </span>
-        </div>
-      )}
+              <span className="text-xs font-medium">{server.name}</span>
+            </div>
+          </Button>
+        ))}
+      </div>
     </div>
   );
 }

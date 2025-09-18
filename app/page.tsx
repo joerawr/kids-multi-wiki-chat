@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   Conversation,
   ConversationContent,
@@ -84,21 +85,30 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col max-w-4xl mx-auto relative">
-      <div className="border-b p-4 space-y-4">
-        <h1 className="text-xl font-semibold">Wiki Chat Assistant</h1>
+    <div className="min-h-screen bg-gradient-to-br from-[#cadcc1] via-[#eaf3cf] to-[#afd3ea] flex flex-col max-w-4xl mx-auto relative">
+      <div className="border-b border-white/20 bg-white/10 backdrop-blur-sm p-4 space-y-4">
+        <div className="flex justify-center">
+          <Image
+            src="/KnowledgeQuest2.png"
+            alt="Knowledge Quest"
+            width={521}
+            height={220}
+            className="h-auto max-w-full"
+            priority
+          />
+        </div>
         <MCPSelector
           onServerChange={handleMCPServerChange}
           disabled={isLoading}
         />
       </div>
 
-      <Conversation className="flex-1">
+      <Conversation className="flex-1 bg-white/5 backdrop-blur-sm">
         <ConversationContent className="space-y-4">
           {messages.length === 0 ? (
             <ConversationEmptyState
-              title="Start a conversation"
-              description="Ask me anything and I'll help you out!"
+              title="Ready for an adventure?"
+              description="Ask me anything about Minecraft, Pokemon, or the world around us!"
             />
           ) : (
             messages.map((message) => (
@@ -123,10 +133,10 @@ export default function Home() {
         </ConversationContent>
       </Conversation>
 
-      <div className="p-4">
+      <div className="p-4 bg-white/20 backdrop-blur-sm border-t border-white/20">
         <PromptInput onSubmit={handleSubmit}>
           <PromptInputBody>
-            <PromptInputTextarea placeholder="What would you like to know?" />
+            <PromptInputTextarea placeholder="What do you want to learn about?" />
             <PromptInputToolbar>
               <div />
               <PromptInputSubmit status={isLoading ? "submitted" : undefined} />
@@ -135,7 +145,7 @@ export default function Home() {
         </PromptInput>
       </div>
 
-      <div className="px-4 pb-4 text-xs text-muted-foreground text-right">
+      <div className="px-4 pb-4 text-xs text-gray-600 text-right">
         Gemini 2.5 Flash
       </div>
     </div>

@@ -117,9 +117,7 @@ I can still help with general questions, but the specialized wiki sources will p
     console.log('Making request to Gemini...');
 
     const { text } = await generateText({
-      model: google('gemini-2.5-flash', {
-        apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
-      }),
+      model: google('gemini-2.5-flash'),
       prompt: fullPrompt,
     });
 
