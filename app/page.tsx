@@ -37,7 +37,7 @@ export default function Home() {
     const userMessage: UIMessage = {
       id: Date.now().toString(),
       role: "user",
-      content: message.text,
+      parts: [{ type: "text", text: message.text }],
     };
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
@@ -58,7 +58,7 @@ export default function Home() {
         const assistantMessage: UIMessage = {
           id: (Date.now() + 1).toString(),
           role: "assistant",
-          content: data.response,
+          parts: [{ type: "text", text: data.response }],
         };
         setMessages((prev) => [...prev, assistantMessage]);
       } else {
@@ -69,7 +69,7 @@ export default function Home() {
       const errorMessage: UIMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "Sorry, I encountered an error. Please try again.",
+        parts: [{ type: "text", text: "Sorry, I encountered an error. Please try again." }],
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
@@ -115,9 +115,13 @@ export default function Home() {
               <Message key={message.id} from={message.role}>
                 <MessageContent>
                   <div className="prose prose-sm max-w-none dark:prose-invert">
-                    <ReactMarkdown>
-                      {message.content}
-                    </ReactMarkdown>
+                    {message.parts?.map((part, index) => (
+                      part.type === "text" ? (
+                        <ReactMarkdown key={index}>
+                          {part.text}
+                        </ReactMarkdown>
+                      ) : null
+                    ))}
                   </div>
                 </MessageContent>
               </Message>
