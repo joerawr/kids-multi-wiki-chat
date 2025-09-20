@@ -54,6 +54,13 @@ planning.md
 summary.md
 Summary.md
 progress.md
+docker.md
+2025-*-plan*.txt
 
 # Gemini, Claude, OpenAI, etc
 .claude/
+
+k3_env.txt
+k8s_plan.md
+k8s/secret.local.yaml
+deployment_learnings.md

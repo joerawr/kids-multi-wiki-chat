@@ -29,7 +29,7 @@ export class MCPManager extends EventEmitter {
     minecraft: {
       name: 'Minecraft Wiki',
       command: 'node',
-      args: ['mcp-servers/minecraft/dist/server.js', '--api-url', 'https://minecraft.wiki/api.php'],
+      args: ['mcp-servers/minecraft/server.js', '--api-url', 'https://minecraft.wiki/api.php'],
       cwd: process.cwd()
     },
     pokemon: {
