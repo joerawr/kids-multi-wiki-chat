@@ -1,11 +1,12 @@
 import { google } from '@ai-sdk/google';
+import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 import { NextRequest, NextResponse } from 'next/server';
 import { mcpManager } from '@/lib/mcp/manager';
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, mcpServer } = await request.json();
+    const { message, mcpServer, model } = await request.json();
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
@@ -114,14 +115,34 @@ I can still help with general questions, but the specialized wiki sources will p
 
     const fullPrompt = systemPrompt + '\n\nUser question: ' + message;
 
-    console.log('Making request to Gemini...');
+    // Determine which AI model to use
+    let aiModel;
+    let modelName;
+
+    switch (model) {
+      case 'gemini-2.5-pro':
+        aiModel = google('gemini-2.5-pro');
+        modelName = 'Gemini 2.5 Pro';
+        break;
+      case 'gpt-5':
+        aiModel = openai('gpt-5');
+        modelName = 'OpenAI GPT-5';
+        break;
+      case 'gemini-2.5-flash':
+      default:
+        aiModel = google('gemini-2.5-flash');
+        modelName = 'Gemini 2.5 Flash';
+        break;
+    }
+
+    console.log(`Making request to ${modelName}...`);
 
     const { text } = await generateText({
-      model: google('gemini-2.5-flash'),
+      model: aiModel,
       prompt: fullPrompt,
     });
 
-    console.log('Gemini response received');
+    console.log(`${modelName} response received`);
     return NextResponse.json({
       response: text,
       mcpServer,

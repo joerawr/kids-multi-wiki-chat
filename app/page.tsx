@@ -20,6 +20,7 @@ import {
   PromptInputSubmit,
 } from "@/components/ai-elements/prompt-input";
 import { MCPSelector } from "@/components/mcp-selector";
+import { ModelSelector, type AIModel } from "@/components/model-selector";
 import ReactMarkdown from "react-markdown";
 import type { UIMessage } from "ai";
 
@@ -27,6 +28,7 @@ export default function Home() {
   const [messages, setMessages] = useState<UIMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeMCPServer, setActiveMCPServer] = useState<string | null>(null);
+  const [selectedModel, setSelectedModel] = useState<AIModel>("gemini-2.5-flash");
 
   const handleSubmit = async (
     message: { text?: string; files?: any[] },
@@ -48,7 +50,8 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: message.text,
-          mcpServer: activeMCPServer
+          mcpServer: activeMCPServer,
+          model: selectedModel
         }),
       });
 
@@ -82,6 +85,10 @@ export default function Home() {
 
   const handleMCPServerChange = (serverId: string | null) => {
     setActiveMCPServer(serverId);
+  };
+
+  const handleModelChange = (model: AIModel) => {
+    setSelectedModel(model);
   };
 
   return (
@@ -149,8 +156,11 @@ export default function Home() {
         </PromptInput>
       </div>
 
-      <div className="px-4 pb-4 text-xs text-gray-600 text-right">
-        Gemini 2.5 Flash
+      <div className="px-4 pb-4 flex justify-end">
+        <ModelSelector
+          onModelChange={handleModelChange}
+          disabled={isLoading}
+        />
       </div>
     </div>
   );
