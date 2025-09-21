@@ -47,6 +47,8 @@ export async function POST(request: NextRequest) {
         if (mcpServer === 'minecraft') {
           systemPrompt = `You are a helpful assistant that provides information about Minecraft. You have access to the official Minecraft Wiki through an MCP server. When users ask about Minecraft-related topics, use the information from the wiki to provide accurate, detailed responses.
 
+Format your responses using Markdown for better readability. Use headers, bullet points, code blocks, and other Markdown formatting as appropriate.
+
 If a user asks about topics not related to Minecraft (like Pokemon or general knowledge), politely remind them to switch to the appropriate wiki source using the dropdown at the top of the page.
 
 Current active wiki source: Minecraft Wiki`;
@@ -68,11 +70,15 @@ Current active wiki source: Minecraft Wiki`;
         } else if (mcpServer === 'pokemon') {
           systemPrompt = `You are a helpful assistant that provides information about Pokemon. You have access to Bulbapedia (Pokemon wiki) through an MCP server.
 
+Format your responses using Markdown for better readability. Use headers, bullet points, code blocks, and other Markdown formatting as appropriate.
+
 If a user asks about topics not related to Pokemon (like Minecraft or general knowledge), politely remind them to switch to the appropriate wiki source using the dropdown at the top of the page.
 
 Current active wiki source: Pokemon (Bulbapedia)`;
         } else if (mcpServer === 'wikipedia') {
           systemPrompt = `You are a helpful assistant that provides general knowledge and information from Wikipedia.
+
+Format your responses using Markdown for better readability. Use headers, bullet points, code blocks, and other Markdown formatting as appropriate.
 
 If a user asks about specific topics like Minecraft or Pokemon, politely remind them that more detailed information is available by switching to the specialized wiki sources using the dropdown at the top of the page.
 
@@ -105,6 +111,8 @@ Current active wiki source: Wikipedia`;
     } else {
       systemPrompt = `You are a helpful assistant. Currently, no specific wiki source is selected.
 
+Format your responses using Markdown for better readability. Use headers, bullet points, code blocks, and other Markdown formatting as appropriate.
+
 To get more detailed and accurate information about specific topics, please select an appropriate wiki source from the dropdown at the top of the page:
 - Minecraft: For Minecraft-related questions
 - Pokemon: For Pokemon-related questions
@@ -113,7 +121,7 @@ To get more detailed and accurate information about specific topics, please sele
 I can still help with general questions, but the specialized wiki sources will provide much more detailed and accurate information for their respective topics.`;
     }
 
-    const fullPrompt = systemPrompt + '\n\nUser question: ' + message;
+    const fullPrompt = systemPrompt + '\n\nIMPORTANT: Format your response using proper Markdown syntax including headers (##), bullet points (-), bold (**text**), italic (*text*), and code blocks (```). Make your response well-structured and easy to read.\n\nUser question: ' + message;
 
     // Determine which AI model to use
     let aiModel;
