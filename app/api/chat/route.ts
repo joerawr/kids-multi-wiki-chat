@@ -6,13 +6,17 @@ import { mcpManager } from '@/lib/mcp/manager';
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, mcpServer, model } = await request.json();
+    const { messages, mcpServer, model } = await request.json();
 
-    if (!message) {
-      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return NextResponse.json({ error: 'Messages array is required' }, { status: 400 });
     }
 
-    console.log('Chat request:', { message: message.substring(0, 100), mcpServer });
+    // Get the latest user message for MCP search
+    const latestMessage = messages[messages.length - 1];
+    const messageText = latestMessage?.content || '';
+
+    console.log('Chat request:', { messageText: messageText.substring(0, 100), mcpServer });
     console.log('MCP Status:', {
       requestedServer: mcpServer,
       isActive: mcpManager.isServerActive(),
@@ -56,7 +60,7 @@ Current active wiki source: Minecraft Wiki`;
           // Try to search for relevant information
           try {
             const searchResult = await mcpManager.callTool('MinecraftWiki_searchWiki', {
-              query: message
+              query: messageText
             });
 
             if (searchResult && searchResult.content) {
@@ -91,7 +95,7 @@ Current active wiki source: Wikipedia`;
             console.log('Wikipedia Python MCP tools available:', JSON.stringify(toolsList, null, 2));
 
             const searchResult = await mcpManager.callTool('search_wikipedia', {
-              query: message,
+              query: messageText,
               limit: 5
             });
 
@@ -121,7 +125,14 @@ To get more detailed and accurate information about specific topics, please sele
 I can still help with general questions, but the specialized wiki sources will provide much more detailed and accurate information for their respective topics.`;
     }
 
-    const fullPrompt = systemPrompt + '\n\nIMPORTANT: Format your response using proper Markdown syntax including headers (##), bullet points (-), bold (**text**), italic (*text*), and code blocks (```). Make your response well-structured and easy to read.\n\nUser question: ' + message;
+    // Add Markdown formatting instruction to system prompt
+    const finalSystemPrompt = systemPrompt + '\n\nIMPORTANT: Format your response using proper Markdown syntax including headers (##), bullet points (-), bold (**text**), italic (*text*), and code blocks (```). Make your response well-structured and easy to read.';
+
+    // Convert frontend message format to AI SDK format
+    const aiMessages = messages.map((msg: any) => ({
+      role: msg.role,
+      content: msg.content,
+    }));
 
     // Determine which AI model to use
     let aiModel;
@@ -147,7 +158,8 @@ I can still help with general questions, but the specialized wiki sources will p
 
     const { text } = await generateText({
       model: aiModel,
-      prompt: fullPrompt,
+      system: finalSystemPrompt,
+      messages: aiMessages,
     });
 
     console.log(`${modelName} response received`);

@@ -41,15 +41,24 @@ export default function Home() {
       role: "user",
       parts: [{ type: "text", text: message.text }],
     };
-    setMessages((prev) => [...prev, userMessage]);
+
+    // Create the updated messages array including the new user message
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setIsLoading(true);
 
     try {
+      // Convert UIMessage format to simple message format for API
+      const apiMessages = updatedMessages.map(msg => ({
+        role: msg.role,
+        content: msg.parts?.find(part => part.type === "text")?.text || ""
+      }));
+
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: message.text,
+          messages: apiMessages,
           mcpServer: activeMCPServer,
           model: selectedModel
         }),
