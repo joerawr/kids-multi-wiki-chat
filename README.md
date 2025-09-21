@@ -30,7 +30,8 @@ This README is aimed at tech-savvy parents who want to host a safe research comp
 - **Node.js 20+** (for the Next.js front end). Installing via [volta](https://volta.sh) or [nvm](https://github.com/nvm-sh/nvm) keeps things tidy.
 - **pnpm** package manager: `npm install -g pnpm`.
 - **Python 3.11+** (already vendored in `mcp-servers/wikipedia/venv`, but you can recreate it if you prefer).
-- **Google Gemini API key** – create one in the [Google AI Studio](https://aistudio.google.com/) dashboard.
+- **OpenAI API key** – create one in the [OpenAI Platform](https://platform.openai.com/) dashboard (supports GPT-5 and other models).
+- **Google Gemini API key** (optional) – create one in the [Google AI Studio](https://aistudio.google.com/) dashboard.
 
 Optional (for future extensions): Docker, git, and familiarity with MCP protocols.
 
@@ -38,44 +39,59 @@ Optional (for future extensions): Docker, git, and familiarity with MCP protocol
 
 ## Getting Started
 
-1. **Install dependencies**
+### Quick Setup (Recommended)
+
+1. **Run the install script**
    ```bash
-   pnpm install
+   chmod +x install.sh
+   ./install.sh
+   ```
+   This installs all dependencies for the main project and all MCP servers.
+
+2. **Configure your API keys**
+   Create a `.env.local` file with your API keys:
+   ```bash
+   echo "OPENAI_API_KEY=your-openai-key" >> .env.local
+   echo "GOOGLE_GENERATIVE_AI_API_KEY=your-gemini-key" >> .env.local
    ```
 
-2. **Provide your Gemini key**
-   ```bash
-   cp .env.local.example .env.local  # if the example file exists
-   # or create/edit .env.local manually
-   echo "GOOGLE_GENERATIVE_AI_API_KEY=your-real-key" >> .env.local
-   ```
-
-3. **Verify MCP binaries**
-   - Minecraft MCP is bundled under `mcp-servers/minecraft`.
-   - Pokémon MCP uses the MediaWiki MCP npm package (`mcp-servers/pokemon`).
-   - Wikipedia MCP lives in `mcp-servers/wikipedia/venv`. If you’d like a fresh install:
-     ```bash
-     python3 -m venv mcp-servers/wikipedia/venv
-     source mcp-servers/wikipedia/venv/bin/activate
-     pip install wikipedia-mcp fastmcp
-     deactivate
-     ```
-
-4. **Start the app**
+3. **Start the app**
    ```bash
    pnpm dev
    ```
 
-5. **Open the interface**
+4. **Open the interface**
    Navigate to [http://localhost:3000](http://localhost:3000). The chat window and wiki selector buttons appear immediately.
+
+### Manual Setup (Alternative)
+
+1. **Install main dependencies**
+   ```bash
+   pnpm install
+   ```
+
+2. **Install MCP server dependencies**
+   ```bash
+   # Minecraft MCP
+   cd mcp-servers/minecraft && pnpm install && cd ../..
+
+   # Pokemon MCP
+   cd mcp-servers/pokemon && pnpm install && cd ../..
+
+   # Wikipedia MCP
+   cd mcp-servers/wikipedia && pnpm install && cd ../..
+   ```
+
+3. **Configure API keys and start** (same as steps 2-4 above)
 
 ---
 
 ## Customization & Advanced Topics
 
 ### Changing the AI Provider
-- The default model is configured in `app/api/chat/route.ts` via `google('gemini-2.5-flash', ...)`.
-- To experiment with OpenAI or other providers, swap in the relevant AI SDK driver and update `.env.local` with the appropriate API key.
+- The app supports both OpenAI (GPT-5) and Google (Gemini 2.5 Pro/Flash) models.
+- Models are configured in `app/api/chat/route.ts` and can be switched via the model selector in the UI.
+- Add the appropriate API keys to `.env.local` for the models you want to use.
 
 ### Adding Another Wiki (MediaWiki-based)
 1. Duplicate `mcp-servers/pokemon` and update the environment variables to target your new wiki’s API.
@@ -92,10 +108,11 @@ Optional (for future extensions): Docker, git, and familiarity with MCP protocol
 ## Troubleshooting
 | Symptom | What to Check |
 | --- | --- |
-| Gemini complains about missing API key | Confirm `GOOGLE_GENERATIVE_AI_API_KEY` is set in `.env.local` and restart the dev server. |
-| “Failed to switch MCP server” error | Inspect terminal logs—most common causes are missing binaries or blocked ports. |
+| Missing API key errors | Confirm `OPENAI_API_KEY` and/or `GOOGLE_GENERATIVE_AI_API_KEY` are set in `.env.local` and restart the dev server. |
+| "Failed to switch MCP server" error | Run the install script (`./install.sh`) to ensure all MCP dependencies are installed. Check terminal logs for missing binaries or blocked ports. |
+| "Cannot find module" errors for MCP servers | Run `./install.sh` or manually install dependencies in each MCP server directory. |
 | Wikipedia tool calls fail | Ensure the virtualenv exists and that your machine has outbound HTTPS access. |
-| Pokémon data not returning | Run `pnpm install` inside `mcp-servers/pokemon` if the node_modules folder is missing. |
+| Pokémon/Minecraft data not returning | Verify MCP server dependencies are installed with `./install.sh`. |
 
 ---
 
@@ -107,12 +124,13 @@ Optional (for future extensions): Docker, git, and familiarity with MCP protocol
 
 ---
 
-## Additonal Highlights
+## Additional Highlights
 - **Chat UI** built with Next.js 15, Tailwind, and shadcn/ui components.
-- **Gemini 2.5 Flash** as the default language model (configurable for other providers).
+- **Multiple AI models** – Switch between OpenAI GPT-5 and Google Gemini models.
 - **Process manager** that launches the right MCP server for each wiki and restarts them on demand.
 - **Context-aware prompts** nudge kids to pick the correct source (e.g., Pokémon questions while Minecraft is active).
 - **Markdown responses** render cleanly, including lists, headers, and tables.
+- **Easy setup** with automated install script for all dependencies.
 
 ---
 

@@ -1,17 +1,22 @@
 import { google } from '@ai-sdk/google';
+import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 import { NextRequest, NextResponse } from 'next/server';
 import { mcpManager } from '@/lib/mcp/manager';
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, mcpServer } = await request.json();
+    const { messages, mcpServer, model } = await request.json();
 
-    if (!message) {
-      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return NextResponse.json({ error: 'Messages array is required' }, { status: 400 });
     }
 
-    console.log('Chat request:', { message: message.substring(0, 100), mcpServer });
+    // Get the latest user message for MCP search
+    const latestMessage = messages[messages.length - 1];
+    const messageText = latestMessage?.content || '';
+
+    console.log('Chat request:', { messageText: messageText.substring(0, 100), mcpServer });
     console.log('MCP Status:', {
       requestedServer: mcpServer,
       isActive: mcpManager.isServerActive(),
@@ -46,6 +51,8 @@ export async function POST(request: NextRequest) {
         if (mcpServer === 'minecraft') {
           systemPrompt = `You are a helpful assistant that provides information about Minecraft. You have access to the official Minecraft Wiki through an MCP server. When users ask about Minecraft-related topics, use the information from the wiki to provide accurate, detailed responses.
 
+Format your responses using Markdown for better readability. Use headers, bullet points, code blocks, and other Markdown formatting as appropriate.
+
 If a user asks about topics not related to Minecraft (like Pokemon or general knowledge), politely remind them to switch to the appropriate wiki source using the dropdown at the top of the page.
 
 Current active wiki source: Minecraft Wiki`;
@@ -53,7 +60,7 @@ Current active wiki source: Minecraft Wiki`;
           // Try to search for relevant information
           try {
             const searchResult = await mcpManager.callTool('MinecraftWiki_searchWiki', {
-              query: message
+              query: messageText
             });
 
             if (searchResult && searchResult.content) {
@@ -67,11 +74,15 @@ Current active wiki source: Minecraft Wiki`;
         } else if (mcpServer === 'pokemon') {
           systemPrompt = `You are a helpful assistant that provides information about Pokemon. You have access to Bulbapedia (Pokemon wiki) through an MCP server.
 
+Format your responses using Markdown for better readability. Use headers, bullet points, code blocks, and other Markdown formatting as appropriate.
+
 If a user asks about topics not related to Pokemon (like Minecraft or general knowledge), politely remind them to switch to the appropriate wiki source using the dropdown at the top of the page.
 
 Current active wiki source: Pokemon (Bulbapedia)`;
         } else if (mcpServer === 'wikipedia') {
           systemPrompt = `You are a helpful assistant that provides general knowledge and information from Wikipedia.
+
+Format your responses using Markdown for better readability. Use headers, bullet points, code blocks, and other Markdown formatting as appropriate.
 
 If a user asks about specific topics like Minecraft or Pokemon, politely remind them that more detailed information is available by switching to the specialized wiki sources using the dropdown at the top of the page.
 
@@ -84,7 +95,7 @@ Current active wiki source: Wikipedia`;
             console.log('Wikipedia Python MCP tools available:', JSON.stringify(toolsList, null, 2));
 
             const searchResult = await mcpManager.callTool('search_wikipedia', {
-              query: message,
+              query: messageText,
               limit: 5
             });
 
@@ -104,6 +115,8 @@ Current active wiki source: Wikipedia`;
     } else {
       systemPrompt = `You are a helpful assistant. Currently, no specific wiki source is selected.
 
+Format your responses using Markdown for better readability. Use headers, bullet points, code blocks, and other Markdown formatting as appropriate.
+
 To get more detailed and accurate information about specific topics, please select an appropriate wiki source from the dropdown at the top of the page:
 - Minecraft: For Minecraft-related questions
 - Pokemon: For Pokemon-related questions
@@ -112,16 +125,44 @@ To get more detailed and accurate information about specific topics, please sele
 I can still help with general questions, but the specialized wiki sources will provide much more detailed and accurate information for their respective topics.`;
     }
 
-    const fullPrompt = systemPrompt + '\n\nUser question: ' + message;
+    // Add Markdown formatting instruction to system prompt
+    const finalSystemPrompt = systemPrompt + '\n\nIMPORTANT: Format your response using proper Markdown syntax including headers (##), bullet points (-), bold (**text**), italic (*text*), and code blocks (```). Make your response well-structured and easy to read.';
 
-    console.log('Making request to Gemini...');
+    // Convert frontend message format to AI SDK format
+    const aiMessages = messages.map((msg: any) => ({
+      role: msg.role,
+      content: msg.content,
+    }));
+
+    // Determine which AI model to use
+    let aiModel;
+    let modelName;
+
+    switch (model) {
+      case 'gemini-2.5-pro':
+        aiModel = google('gemini-2.5-pro');
+        modelName = 'Gemini 2.5 Pro';
+        break;
+      case 'gpt-5':
+        aiModel = openai('gpt-5');
+        modelName = 'OpenAI GPT-5';
+        break;
+      case 'gemini-2.5-flash':
+      default:
+        aiModel = google('gemini-2.5-flash');
+        modelName = 'Gemini 2.5 Flash';
+        break;
+    }
+
+    console.log(`Making request to ${modelName}...`);
 
     const { text } = await generateText({
-      model: google('gemini-2.5-flash'),
-      prompt: fullPrompt,
+      model: aiModel,
+      system: finalSystemPrompt,
+      messages: aiMessages,
     });
 
-    console.log('Gemini response received');
+    console.log(`${modelName} response received`);
     return NextResponse.json({
       response: text,
       mcpServer,

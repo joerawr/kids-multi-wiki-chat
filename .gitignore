@@ -64,3 +64,5 @@ k3_env.txt
 k8s_plan.md
 k8s/secret.local.yaml
 deployment_learnings.md
+fixing_minecraft_mcp.txt
+fixing_minecraft_mcp_and_adding_memory.txt
