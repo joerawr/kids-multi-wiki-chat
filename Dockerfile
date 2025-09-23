@@ -46,13 +46,17 @@ RUN cp -r mcp-servers/minecraft-wiki/dist/* mcp-servers/minecraft/
 RUN cp -r mcp-servers/minecraft-wiki/node_modules mcp-servers/minecraft/
 RUN cp mcp-servers/minecraft-wiki/package.json mcp-servers/minecraft/
 
-# Set up Pokemon MCP server (MediaWiki wrapper)
+# Set up MediaWiki-based MCP servers (Pokemon, Lego, Star Wars, Wings of Fire)
 COPY mcp-servers/pokemon /app/mcp-servers/pokemon
-WORKDIR /app/mcp-servers/pokemon
-RUN npm install
+COPY mcp-servers/lego /app/mcp-servers/lego
+COPY mcp-servers/starwars /app/mcp-servers/starwars
+COPY mcp-servers/wingsoffire /app/mcp-servers/wingsoffire
+WORKDIR /app/mcp-servers
+RUN for dir in pokemon lego starwars wingsoffire; do \
+        npm install --prefix "/app/mcp-servers/$dir"; \
+    done
 
 # Set up Wikipedia MCP server (Python)
-WORKDIR /app/mcp-servers
 RUN python3 -m venv wikipedia/venv
 RUN wikipedia/venv/bin/pip install wikipedia-mcp
 

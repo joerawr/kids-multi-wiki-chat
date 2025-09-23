@@ -36,7 +36,7 @@ fi
 Ensure these environment variables are set or substitute them in the commands:
 
 ```bash
-export GITHUB_USERNAME="joerawr"  # Your GitHub username
+export GITHUB_USERNAME="joerawr"
 export IMAGE_NAME="kids-multi-wiki-chat"
 export IMAGE_TAG="latest"  # Or use version tags like "v1.2.0"
 ```
@@ -79,20 +79,7 @@ docker build -t ghcr.io/${GITHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} .
 
 ### 3. Push to GitHub Container Registry (GHCR)
 
-#### Option A: Using GitHub CLI (Recommended)
 ```bash
-# Login to GHCR using GitHub CLI
-echo $GITHUB_TOKEN | docker login ghcr.io -u ${GITHUB_USERNAME} --password-stdin
-
-# Push the image
-docker push ghcr.io/${GITHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}
-```
-
-#### Option B: Using Personal Access Token
-```bash
-# Login to GHCR with a personal access token
-echo $GITHUB_PAT | docker login ghcr.io -u ${GITHUB_USERNAME} --password-stdin
-
 # Push the image
 docker push ghcr.io/${GITHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}
 ```
@@ -102,19 +89,19 @@ docker push ghcr.io/${GITHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}
 #### Option A: Restart Deployment (if using :latest tag)
 ```bash
 # Restart the deployment to pull the new image
-kubectl rollout restart deployment/kids-multi-wiki-chat -n default
+kubectl rollout restart deployment/wiki-chat -n knowledge-quest
 
 # Wait for rollout to complete
-kubectl rollout status deployment/kids-multi-wiki-chat -n default
+kubectl rollout status deployment/wiki-chat -n knowledge-quest
 ```
 
 #### Option B: Update Image Tag (if using version tags)
 ```bash
 # Update the deployment with the new image tag
-kubectl set image deployment/kids-multi-wiki-chat kids-multi-wiki-chat=ghcr.io/${GITHUB_USERNAME}/${IMAGE_NAME}:v1.2.0 -n default
+kubectl set image deployment/wiki-chat -n knowledge-quest=ghcr.io/${GITHUB_USERNAME}/${IMAGE_NAME}:v1.2.0 -n default
 
 # Wait for rollout to complete
-kubectl rollout status deployment/kids-multi-wiki-chat -n default
+kubectl rollout status deployment/wiki-chat -n knowledge-quest
 ```
 
 ### 5. Verify Deployment
@@ -123,19 +110,18 @@ Check that the application is running with the updated code:
 
 ```bash
 # Check pod status
-kubectl get pods -l app=kids-multi-wiki-chat -n default
+kubectl get pods -n knowledge-quest
 
 # Check deployment status
-kubectl get deployment kids-multi-wiki-chat -n default
+kubectl get deployment wiki-chat -n knowledge-quest
 
 # View recent logs
-kubectl logs -l app=kids-multi-wiki-chat -n default --tail=50
+PODNAME=$(kubectl get pods -n knowledge-quest -o jsonpath='{.items[0].metadata.name}')
+kubectl logs $PODNAME -n knowledge-quest --tail=50
 
 # Check if the service is accessible
-kubectl get service kids-multi-wiki-chat -n default
+kubectl get service wiki-chat-service -n knowledge-quest
 
-# If using port-forward for testing:
-# kubectl port-forward service/kids-multi-wiki-chat 3000:3000 -n default
 ```
 
 ## Troubleshooting
