@@ -1,6 +1,6 @@
 # Knowledge Quest
 
-A family-friendly wiki helper that lets kids explore Minecraft, Pokémon, and general knowledge without ads or tracking. The app runs locally on your computer, uses Google Gemini 2.5 Flash for natural-language chat, and spins up dedicated Model Context Protocol (MCP) servers to fetch accurate information straight from curated wikis.
+A family-friendly wiki helper that lets kids explore multiple themed wikis without ads or tracking. The app runs locally on your computer, uses AI models for natural-language chat, and spins up dedicated Model Context Protocol (MCP) servers to fetch accurate information straight from curated wikis.
 
 This README is aimed at tech-savvy parents who want to host a safe research companion at home while keeping full control over the data flow.
 
@@ -10,15 +10,21 @@ This README is aimed at tech-savvy parents who want to host a safe research comp
 
 ## Why You Might Like This
 - **Kid-first browsing** – questions are answered with age-appropriate language and clear citations instead of search-engine rabbit holes.
-- **Three instant knowledge modes** – switch between Minecraft Wiki, Bulbapedia (Pokémon), and Wikipedia with image buttons.
+- **Six instant knowledge modes** – switch between Lego, Minecraft, Pokémon, Star Wars, Wikipedia, and Wings of Fire wikis with image buttons.
 - **No mystery cloud services** – everything runs on your machine; stop the app and all MCP processes shut down.
 - **Built to extend** – add new wikis or swap AI models as your family’s interests change.
 
 ---
 
 ## Using the App with Your Kids
-1. Click one of the three image buttons to select a wiki source (Minecraft, Pokémon, or Wikipedia).
-2. Ask a question in the chat box. The app starts the appropriate MCP server if it isn’t already running.
+1. Click one of the six image buttons to select a wiki source:
+   - **Lego** – Brickimedia wiki for LEGO sets, themes, and building guides
+   - **Minecraft** – Official Minecraft Wiki for gameplay, blocks, and mechanics
+   - **Pokémon** – Bulbapedia for Pokémon species, games, and lore
+   - **Star Wars** – Fandom wiki for characters, planets, and storylines
+   - **Wikipedia** – General knowledge and encyclopedic information
+   - **Wings of Fire** – Fandom wiki for the dragon book series
+2. Ask a question in the chat box. The app starts the appropriate MCP server if it isn't already running.
 3. Responses include wiki-backed facts when available; if the wrong source is active, the assistant politely reminds you to switch.
 4. Change sources at any time—the previous MCP server is stopped automatically.
 
@@ -72,14 +78,23 @@ Optional (for future extensions): Docker, git, and familiarity with MCP protocol
 
 2. **Install MCP server dependencies**
    ```bash
+   # Lego MCP
+   cd mcp-servers/lego && pnpm install && cd ../..
+
    # Minecraft MCP
    cd mcp-servers/minecraft && pnpm install && cd ../..
 
    # Pokemon MCP
    cd mcp-servers/pokemon && pnpm install && cd ../..
 
+   # Star Wars MCP
+   cd mcp-servers/starwars && pnpm install && cd ../..
+
    # Wikipedia MCP
    cd mcp-servers/wikipedia && pnpm install && cd ../..
+
+   # Wings of Fire MCP
+   cd mcp-servers/wingsoffire && pnpm install && cd ../..
    ```
 
 3. **Configure API keys and start** (same as steps 2-4 above)
@@ -94,9 +109,10 @@ Optional (for future extensions): Docker, git, and familiarity with MCP protocol
 - Add the appropriate API keys to `.env.local` for the models you want to use.
 
 ### Adding Another Wiki (MediaWiki-based)
-1. Duplicate `mcp-servers/pokemon` and update the environment variables to target your new wiki’s API.
-2. Register the server in `lib/mcp/manager.ts` and expose it through `components/mcp-selector.tsx` (add your image to the public folder).
+1. Duplicate one of the existing MCP server directories (e.g., `mcp-servers/pokemon`) and update the environment variables to target your new wiki's API.
+2. Register the server in `lib/mcp/manager.ts` and expose it through `components/mcp-selector.tsx` (add your button image to the public folder).
 3. Update the system prompt logic in `app/api/chat/route.ts` to tailor responses for the new topic.
+4. Run `pnpm install` in your new MCP server directory to install dependencies.
 
 ### Integrating a Custom MCP (TypeScript/Python/Node)
 - Follow the structure inside `mcp-servers/minecraft` (TypeScript) or `mcp-servers/wikipedia` (Python) for inspiration.
@@ -112,7 +128,7 @@ Optional (for future extensions): Docker, git, and familiarity with MCP protocol
 | "Failed to switch MCP server" error | Run the install script (`./install.sh`) to ensure all MCP dependencies are installed. Check terminal logs for missing binaries or blocked ports. |
 | "Cannot find module" errors for MCP servers | Run `./install.sh` or manually install dependencies in each MCP server directory. |
 | Wikipedia tool calls fail | Ensure the virtualenv exists and that your machine has outbound HTTPS access. |
-| Pokémon/Minecraft data not returning | Verify MCP server dependencies are installed with `./install.sh`. |
+| Wiki data not returning | Verify MCP server dependencies are installed with `./install.sh`. Check that the specific MCP server can start by testing the API endpoint. |
 
 ---
 

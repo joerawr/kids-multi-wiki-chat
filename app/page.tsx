@@ -124,7 +124,7 @@ export default function Home() {
           {messages.length === 0 ? (
             <ConversationEmptyState
               title="Ready for an adventure?"
-              description="Ask me anything about Minecraft, Pokemon, or the world around us!"
+              description="Choose a wiki source above and ask me anything about your favorite topics!"
             />
           ) : (
             messages.map((message) => (

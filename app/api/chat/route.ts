@@ -79,6 +79,30 @@ Format your responses using Markdown for better readability. Use headers, bullet
 If a user asks about topics not related to Pokemon (like Minecraft or general knowledge), politely remind them to switch to the appropriate wiki source using the dropdown at the top of the page.
 
 Current active wiki source: Pokemon (Bulbapedia)`;
+        } else if (mcpServer === 'lego') {
+          systemPrompt = `You are a helpful assistant that provides information about Lego. You have access to Brickimedia (Lego wiki) through an MCP server.
+
+Format your responses using Markdown for better readability. Use headers, bullet points, code blocks, and other Markdown formatting as appropriate.
+
+If a user asks about topics not related to Lego (like Minecraft or Pokemon), politely remind them to switch to the appropriate wiki source using the dropdown at the top of the page.
+
+Current active wiki source: Lego (Brickimedia)`;
+        } else if (mcpServer === 'starwars') {
+          systemPrompt = `You are a helpful assistant that provides information about Star Wars. You have access to the Star Wars Fandom wiki through an MCP server.
+
+Format your responses using Markdown for better readability. Use headers, bullet points, code blocks, and other Markdown formatting as appropriate.
+
+If a user asks about topics not related to Star Wars (like Minecraft or Pokemon), politely remind them to switch to the appropriate wiki source using the dropdown at the top of the page.
+
+Current active wiki source: Star Wars (Fandom)`;
+        } else if (mcpServer === 'wingsoffire') {
+          systemPrompt = `You are a helpful assistant that provides information about Wings of Fire. You have access to the Wings of Fire Fandom wiki through an MCP server.
+
+Format your responses using Markdown for better readability. Use headers, bullet points, code blocks, and other Markdown formatting as appropriate.
+
+If a user asks about topics not related to Wings of Fire (like Minecraft or Pokemon), politely remind them to switch to the appropriate wiki source using the dropdown at the top of the page.
+
+Current active wiki source: Wings of Fire (Fandom)`;
         } else if (mcpServer === 'wikipedia') {
           systemPrompt = `You are a helpful assistant that provides general knowledge and information from Wikipedia.
 
@@ -118,9 +142,12 @@ Current active wiki source: Wikipedia`;
 Format your responses using Markdown for better readability. Use headers, bullet points, code blocks, and other Markdown formatting as appropriate.
 
 To get more detailed and accurate information about specific topics, please select an appropriate wiki source from the dropdown at the top of the page:
+- Lego: For Lego-related questions
 - Minecraft: For Minecraft-related questions
 - Pokemon: For Pokemon-related questions
+- Star Wars: For Star Wars-related questions
 - Wikipedia: For general knowledge questions
+- Wings of Fire: For Wings of Fire-related questions
 
 I can still help with general questions, but the specialized wiki sources will provide much more detailed and accurate information for their respective topics.`;
     }

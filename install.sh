@@ -19,6 +19,12 @@ pnpm install
 
 echo "🔧 Installing MCP server dependencies..."
 
+# Install Lego MCP dependencies
+echo "  🧱 Installing Lego MCP dependencies..."
+cd mcp-servers/lego
+pnpm install
+cd ../..
+
 # Install Minecraft MCP dependencies
 echo "  ⚒️  Installing Minecraft MCP dependencies..."
 cd mcp-servers/minecraft
@@ -31,9 +37,21 @@ cd mcp-servers/pokemon
 pnpm install
 cd ../..
 
+# Install Star Wars MCP dependencies
+echo "  ⭐ Installing Star Wars MCP dependencies..."
+cd mcp-servers/starwars
+pnpm install
+cd ../..
+
 # Install Wikipedia MCP dependencies
 echo "  📚 Installing Wikipedia MCP dependencies..."
 cd mcp-servers/wikipedia
+pnpm install
+cd ../..
+
+# Install Wings of Fire MCP dependencies
+echo "  🐉 Installing Wings of Fire MCP dependencies..."
+cd mcp-servers/wingsoffire
 pnpm install
 cd ../..
 
