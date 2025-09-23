@@ -26,6 +26,12 @@ export class MCPManager extends EventEmitter {
   private isInitialized = false;
 
   private serverConfigs: Record<string, MCPServerConfig> = {
+    lego: {
+      name: 'Lego (Brickimedia)',
+      command: 'node',
+      args: ['mcp-servers/lego/start-lego-mcp.js'],
+      cwd: process.cwd()
+    },
     minecraft: {
       name: 'Minecraft Wiki',
       command: 'node',
@@ -38,10 +44,22 @@ export class MCPManager extends EventEmitter {
       args: ['mcp-servers/pokemon/start-pokemon-mcp.js'],
       cwd: process.cwd()
     },
+    starwars: {
+      name: 'Star Wars (Fandom)',
+      command: 'node',
+      args: ['mcp-servers/starwars/start-starwars-mcp.js'],
+      cwd: process.cwd()
+    },
     wikipedia: {
       name: 'Wikipedia',
       command: 'mcp-servers/wikipedia/venv/bin/python3',
       args: ['-m', 'wikipedia_mcp', '--country', 'US'],
+      cwd: process.cwd()
+    },
+    wingsoffire: {
+      name: 'Wings of Fire (Fandom)',
+      command: 'node',
+      args: ['mcp-servers/wingsoffire/start-wingsoffire-mcp.js'],
       cwd: process.cwd()
     }
   };

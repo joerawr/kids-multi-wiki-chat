@@ -55,6 +55,9 @@ This is a TypeScript Next.js 15 starter template for AI-powered applications:
 - shadcn/ui: `pnpm dlx shadcn@latest add [component-name]`
 - AI Elements: `pnpm dlx ai-elements@latest` (adds all components)
 
+### Taking notes
+- As we go along keep track of our steps in file called development.md (add it to .gitignore) and don't assume I understand all the steps we are doing. Give a brief explanation, in that file."
+
 ## Environment Setup
 
 Create `.env.local` with:

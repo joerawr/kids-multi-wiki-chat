@@ -13,25 +13,46 @@ export interface MCPServer {
 
 const MCP_SERVERS: (MCPServer & { imagePath: string })[] = [
   {
+    id: 'lego',
+    name: 'Lego',
+    description: 'Lego (Brickimedia) content and information',
+    status: 'idle',
+    imagePath: '/LegoButton_256px.png'
+  },
+  {
     id: 'minecraft',
     name: 'Minecraft',
     description: 'Minecraft Wiki content and information',
     status: 'idle',
-    imagePath: '/Minecraft_pickaxe_256px.png'
+    imagePath: '/MinecraftButton_256px.png'
   },
   {
     id: 'pokemon',
     name: 'Pokemon',
     description: 'Pokemon (Bulbapedia) content and information',
     status: 'idle',
-    imagePath: '/pikachu_in_pokeball_256px.png'
+    imagePath: '/PikachuButton_256px.png'
+  },
+  {
+    id: 'starwars',
+    name: 'Star Wars',
+    description: 'Star Wars (Fandom) content and information',
+    status: 'idle',
+    imagePath: '/StarWarsButton_256px.png'
   },
   {
     id: 'wikipedia',
     name: 'Wikipedia',
     description: 'Wikipedia articles and general knowledge',
     status: 'idle',
-    imagePath: '/Wikipedia-logo-v2-256px.png'
+    imagePath: '/WikipediaButton_256px.png'
+  },
+  {
+    id: 'wingsoffire',
+    name: 'Wings of Fire',
+    description: 'Wings of Fire (Fandom) content and information',
+    status: 'idle',
+    imagePath: '/WingsOfFireButton_256px.png'
   }
 ];
 

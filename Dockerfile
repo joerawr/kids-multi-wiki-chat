@@ -1,6 +1,17 @@
 # Multi-stage build for Kids Multi-Wiki Chat with MCP servers
 FROM node:20-slim AS base
 
+# Architecture safety check - fail build if not x86-64/amd64
+RUN if [ "$(uname -m)" != "x86_64" ] && [ "$(uname -m)" != "amd64" ]; then \
+        echo "❌ ERROR: Wrong architecture detected!"; \
+        echo "   Current: $(uname -m)"; \
+        echo "   Required: x86_64/amd64 for K8s compatibility"; \
+        echo "   Switch to an x86-64 server before building Docker images"; \
+        exit 1; \
+    else \
+        echo "✅ Architecture check passed: $(uname -m)"; \
+    fi
+
 # Install system dependencies for Python and git
 RUN apt-get update && apt-get install -y \
     python3 \
