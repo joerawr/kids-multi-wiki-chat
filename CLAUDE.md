@@ -23,7 +23,7 @@ This is a TypeScript Next.js 15 starter template for AI-powered applications:
 
 ### Core Stack
 - **Next.js 15** with App Router
-- **AI SDK 5** with OpenAI GPT-5 integration
+- **AI SDK 5** with OpenAI GPT-5/GPT-5 Mini integration
 - **shadcn/ui** components (New York style, neutral base color)
 - **Tailwind CSS v4** for styling
 
@@ -35,7 +35,7 @@ This is a TypeScript Next.js 15 starter template for AI-powered applications:
 
 ### AI Integration
 - Uses AI SDK 5's `generateText()` for non-streaming responses
-- Configured for GPT-5 via OpenAI provider
+- Configured for GPT-5/GPT-5 Mini via OpenAI provider
 - API route at `/api/chat` expects `{ message: string }` and returns `{ response: string }`
 - Requires `OPENAI_API_KEY` in `.env.local`
 
