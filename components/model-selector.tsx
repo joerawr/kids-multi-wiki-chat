@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export type AIModel = "gemini-2.5-flash" | "gemini-2.5-pro" | "gpt-5";
+export type AIModel = "gemini-2.5-flash" | "gpt-5-mini" | "gemini-2.5-pro" | "gpt-5";
 
 interface ModelSelectorProps {
   onModelChange: (model: AIModel) => void;
@@ -18,6 +18,7 @@ interface ModelSelectorProps {
 
 const models = [
   { id: "gemini-2.5-flash" as const, name: "Gemini 2.5 Flash" },
+  { id: "gpt-5-mini" as const, name: "OpenAI GPT-5 Mini" },
   { id: "gemini-2.5-pro" as const, name: "Gemini 2.5 Pro" },
   { id: "gpt-5" as const, name: "OpenAI GPT-5" },
 ];

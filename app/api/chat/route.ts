@@ -166,6 +166,10 @@ I can still help with general questions, but the specialized wiki sources will p
     let modelName;
 
     switch (model) {
+      case 'gpt-5-mini':
+        aiModel = openai('gpt-5-mini');
+        modelName = 'OpenAI GPT-5 Mini';
+        break;
       case 'gemini-2.5-pro':
         aiModel = google('gemini-2.5-pro');
         modelName = 'Gemini 2.5 Pro';
