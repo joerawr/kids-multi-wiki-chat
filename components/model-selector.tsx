@@ -14,6 +14,7 @@ export type AIModel = "gemini-2.5-flash" | "gpt-5-mini" | "gemini-2.5-pro" | "gp
 interface ModelSelectorProps {
   onModelChange: (model: AIModel) => void;
   disabled?: boolean;
+  lockedModel?: AIModel | null;
 }
 
 const models = [
@@ -23,7 +24,7 @@ const models = [
   { id: "gpt-5" as const, name: "OpenAI GPT-5" },
 ];
 
-export function ModelSelector({ onModelChange, disabled }: ModelSelectorProps) {
+export function ModelSelector({ onModelChange, disabled, lockedModel }: ModelSelectorProps) {
   const [selectedModel, setSelectedModel] = useState<AIModel>("gemini-2.5-flash");
 
   const handleModelChange = (value: string) => {
@@ -31,6 +32,11 @@ export function ModelSelector({ onModelChange, disabled }: ModelSelectorProps) {
     setSelectedModel(model);
     onModelChange(model);
   };
+
+  // If a locked model is specified, don't render the selector
+  if (lockedModel) {
+    return null;
+  }
 
   return (
     <Select
