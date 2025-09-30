@@ -20,9 +20,9 @@ import {
   PromptInputToolbar,
   PromptInputSubmit,
 } from "@/components/ai-elements/prompt-input";
+import { Response } from "@/components/ai-elements/response";
 import { MCPSelector } from "@/components/mcp-selector";
 import { ModelSelector, type AIModel } from "@/components/model-selector";
-import ReactMarkdown from "react-markdown";
 
 export default function Home() {
   // Check for locked model from environment variable
@@ -33,13 +33,39 @@ export default function Home() {
     lockedModel || "gemini-2.5-flash"
   );
 
-  const { messages, status, sendMessage } = useChat();
+  const { messages, status, sendMessage } = useChat({
+    onFinish: (message) => {
+      // Log the final message when streaming completes
+      console.log('Full message object:', message);
+
+      let messageText = '';
+      const msg = message as any;
+
+      // Try different possible structures
+      if (msg.content) {
+        messageText = msg.content;
+      } else if (Array.isArray(msg.parts)) {
+        const textParts = msg.parts
+          .filter((p: any) => p.type === 'text')
+          .map((p: any) => p.text)
+          .join('');
+        messageText = textParts;
+      } else if (msg.text) {
+        messageText = msg.text;
+      }
+
+      console.log(`[${msg.role || 'assistant'}] (final):`, messageText);
+    }
+  });
 
   const handleSubmit = async (
     message: { text?: string; files?: any[] },
     event: React.FormEvent
   ) => {
     if (!message.text?.trim() || status === "streaming") return;
+
+    // Log user message
+    console.log(`[user]:`, message.text);
 
     // Clear the form immediately
     const form = (event.target as Element)?.closest("form") as HTMLFormElement;
@@ -65,9 +91,6 @@ export default function Home() {
   };
 
   const isLoading = status === "streaming";
-
-  // Debug: log messages structure
-  console.log('Messages:', messages.slice(-1));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#cadcc1] via-[#eaf3cf] to-[#afd3ea] flex flex-col max-w-4xl mx-auto relative">
@@ -112,11 +135,9 @@ export default function Home() {
               return (
                 <Message key={message.id} from={message.role}>
                   <MessageContent>
-                    <div className="prose prose-sm max-w-none dark:prose-invert">
-                      <ReactMarkdown>
-                        {messageText}
-                      </ReactMarkdown>
-                    </div>
+                    <Response>
+                      {messageText}
+                    </Response>
                   </MessageContent>
                 </Message>
               );

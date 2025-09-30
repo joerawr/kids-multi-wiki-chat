@@ -120,4 +120,39 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Streamdown markdown spacing improvements */
+  .streamdown p {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .streamdown ul,
+  .streamdown ol {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .streamdown li {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .streamdown h1,
+  .streamdown h2,
+  .streamdown h3,
+  .streamdown h4,
+  .streamdown h5,
+  .streamdown h6 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .streamdown > *:first-child {
+    margin-top: 0;
+  }
+
+  .streamdown > *:last-child {
+    margin-bottom: 0;
+  }
 }
