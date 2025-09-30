@@ -36,7 +36,7 @@ This README is aimed at tech-savvy parents who want to host a safe research comp
 - **Node.js 20+** (for the Next.js front end). Installing via [volta](https://volta.sh) or [nvm](https://github.com/nvm-sh/nvm) keeps things tidy.
 - **pnpm** package manager: `npm install -g pnpm`.
 - **Python 3.11+** (already vendored in `mcp-servers/wikipedia/venv`, but you can recreate it if you prefer).
-- **OpenAI API key** – create one in the [OpenAI Platform](https://platform.openai.com/) dashboard (supports GPT-5 and other models).
+- **OpenAI API key** – create one in the [OpenAI Platform](https://platform.openai.com/) dashboard (supports GPT-5, GPT-5 Mini, and other models).
 - **Google Gemini API key** (optional) – create one in the [Google AI Studio](https://aistudio.google.com/) dashboard.
 
 Optional (for future extensions): Docker, git, and familiarity with MCP protocols.
@@ -104,7 +104,7 @@ Optional (for future extensions): Docker, git, and familiarity with MCP protocol
 ## Customization & Advanced Topics
 
 ### Changing the AI Provider
-- The app supports both OpenAI (GPT-5) and Google (Gemini 2.5 Pro/Flash) models.
+- The app supports both OpenAI (GPT-5, GPT-5 Mini) and Google (Gemini 2.5 Pro/Flash) models.
 - Models are configured in `app/api/chat/route.ts` and can be switched via the model selector in the UI.
 - Add the appropriate API keys to `.env.local` for the models you want to use.
 
@@ -142,7 +142,7 @@ Optional (for future extensions): Docker, git, and familiarity with MCP protocol
 
 ## Additional Highlights
 - **Chat UI** built with Next.js 15, Tailwind, and shadcn/ui components.
-- **Multiple AI models** – Switch between OpenAI GPT-5 and Google Gemini models.
+- **Multiple AI models** – Switch between OpenAI GPT-5, GPT-5 Mini, and Google Gemini models.
 - **Process manager** that launches the right MCP server for each wiki and restarts them on demand.
 - **Context-aware prompts** nudge kids to pick the correct source (e.g., Pokémon questions while Minecraft is active).
 - **Markdown responses** render cleanly, including lists, headers, and tables.

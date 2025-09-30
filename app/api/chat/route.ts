@@ -1,20 +1,29 @@
 import { google } from '@ai-sdk/google';
 import { openai } from '@ai-sdk/openai';
-import { generateText } from 'ai';
-import { NextRequest, NextResponse } from 'next/server';
+import { streamText, convertToModelMessages } from 'ai';
+import { NextRequest } from 'next/server';
 import { mcpManager } from '@/lib/mcp/manager';
 
 export async function POST(request: NextRequest) {
   try {
     const { messages, mcpServer, model } = await request.json();
 
+    console.log('Raw request body:', JSON.stringify({ messages: messages?.slice(-2), mcpServer, model }, null, 2));
+
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json({ error: 'Messages array is required' }, { status: 400 });
+      return new Response('Messages array is required', { status: 400 });
     }
 
     // Get the latest user message for MCP search
     const latestMessage = messages[messages.length - 1];
-    const messageText = latestMessage?.content || '';
+    // Handle both content (string) and parts (array) formats
+    let messageText = '';
+    if (typeof latestMessage?.content === 'string') {
+      messageText = latestMessage.content;
+    } else if (Array.isArray(latestMessage?.parts)) {
+      const textPart = latestMessage.parts.find((p: any) => p.type === 'text');
+      messageText = textPart?.text || '';
+    }
 
     console.log('Chat request:', { messageText: messageText.substring(0, 100), mcpServer });
     console.log('MCP Status:', {
@@ -155,17 +164,18 @@ I can still help with general questions, but the specialized wiki sources will p
     // Add Markdown formatting instruction to system prompt
     const finalSystemPrompt = systemPrompt + '\n\nIMPORTANT: Format your response using proper Markdown syntax including headers (##), bullet points (-), bold (**text**), italic (*text*), and code blocks (```). Make your response well-structured and easy to read.';
 
-    // Convert frontend message format to AI SDK format
-    const aiMessages = messages.map((msg: any) => ({
-      role: msg.role,
-      content: msg.content,
-    }));
+    // Convert UIMessages to ModelMessages using AI SDK utility
+    const modelMessages = convertToModelMessages(messages);
 
     // Determine which AI model to use
     let aiModel;
     let modelName;
 
     switch (model) {
+      case 'gpt-5-mini':
+        aiModel = openai('gpt-5-mini');
+        modelName = 'OpenAI GPT-5 Mini';
+        break;
       case 'gemini-2.5-pro':
         aiModel = google('gemini-2.5-pro');
         modelName = 'Gemini 2.5 Pro';
@@ -176,30 +186,23 @@ I can still help with general questions, but the specialized wiki sources will p
         break;
       case 'gemini-2.5-flash':
       default:
-        aiModel = google('gemini-2.5-flash');
+        aiModel = google('gemini-2.5-flash-preview-09-2025');
         modelName = 'Gemini 2.5 Flash';
         break;
     }
 
     console.log(`Making request to ${modelName}...`);
 
-    const { text } = await generateText({
+    const result = streamText({
       model: aiModel,
       system: finalSystemPrompt,
-      messages: aiMessages,
+      messages: modelMessages,
     });
 
-    console.log(`${modelName} response received`);
-    return NextResponse.json({
-      response: text,
-      mcpServer,
-      mcpDataUsed: !!mcpData
-    });
+    console.log(`${modelName} streaming response started`);
+    return result.toUIMessageStreamResponse();
   } catch (error) {
     console.error('Chat API error:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate response', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    return new Response('Failed to generate response', { status: 500 });
   }
 }

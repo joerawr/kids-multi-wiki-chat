@@ -72,3 +72,6 @@ deployment_learnings.md
 fixing_minecraft_mcp.txt
 fixing_minecraft_mcp_and_adding_memory.txt
 2025-09-25-which-of-these-is-more-correct-for-setting-up-http.txt
+
+# Claude export files
+*.txt

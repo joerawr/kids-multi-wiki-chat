@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useChat } from "@ai-sdk/react";
 import Image from "next/image";
 import {
   Conversation,
@@ -22,74 +23,39 @@ import {
 import { MCPSelector } from "@/components/mcp-selector";
 import { ModelSelector, type AIModel } from "@/components/model-selector";
 import ReactMarkdown from "react-markdown";
-import type { UIMessage } from "ai";
 
 export default function Home() {
-  const [messages, setMessages] = useState<UIMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  // Check for locked model from environment variable
+  const lockedModel = (process.env.NEXT_PUBLIC_LOCKED_MODEL as AIModel) || null;
+
   const [activeMCPServer, setActiveMCPServer] = useState<string | null>(null);
-  const [selectedModel, setSelectedModel] = useState<AIModel>("gemini-2.5-flash");
+  const [selectedModel, setSelectedModel] = useState<AIModel>(
+    lockedModel || "gemini-2.5-flash"
+  );
+
+  const { messages, status, sendMessage } = useChat({
+    api: "/api/chat",
+  });
 
   const handleSubmit = async (
     message: { text?: string; files?: any[] },
     event: React.FormEvent
   ) => {
-    if (!message.text?.trim() || isLoading) return;
+    if (!message.text?.trim() || status === "streaming") return;
 
-    const userMessage: UIMessage = {
-      id: Date.now().toString(),
-      role: "user",
-      parts: [{ type: "text", text: message.text }],
-    };
-
-    // Create the updated messages array including the new user message
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
-    setIsLoading(true);
-
-    try {
-      // Convert UIMessage format to simple message format for API
-      const apiMessages = updatedMessages.map(msg => ({
-        role: msg.role,
-        content: msg.parts?.find(part => part.type === "text")?.text || ""
-      }));
-
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: apiMessages,
-          mcpServer: activeMCPServer,
-          model: selectedModel
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        const assistantMessage: UIMessage = {
-          id: (Date.now() + 1).toString(),
-          role: "assistant",
-          parts: [{ type: "text", text: data.response }],
-        };
-        setMessages((prev) => [...prev, assistantMessage]);
-      } else {
-        throw new Error(data.error || "Failed to get response");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      const errorMessage: UIMessage = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        parts: [{ type: "text", text: "Sorry, I encountered an error. Please try again." }],
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
+    // Clear the form immediately
+    const form = (event.target as Element)?.closest("form") as HTMLFormElement;
+    if (form) {
+      form.reset();
     }
 
-    // Reset form
-    (event.target as HTMLFormElement).reset();
+    // Send message using useChat's sendMessage with dynamic body params
+    sendMessage({ text: message.text }, {
+      body: {
+        mcpServer: activeMCPServer,
+        model: selectedModel,
+      },
+    });
   };
 
   const handleMCPServerChange = (serverId: string | null) => {
@@ -99,6 +65,11 @@ export default function Home() {
   const handleModelChange = (model: AIModel) => {
     setSelectedModel(model);
   };
+
+  const isLoading = status === "streaming";
+
+  // Debug: log messages structure
+  console.log('Messages:', messages.slice(-1));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#cadcc1] via-[#eaf3cf] to-[#afd3ea] flex flex-col max-w-4xl mx-auto relative">
@@ -127,21 +98,31 @@ export default function Home() {
               description="Choose a wiki source above and ask me anything about your favorite topics!"
             />
           ) : (
-            messages.map((message) => (
-              <Message key={message.id} from={message.role}>
-                <MessageContent>
-                  <div className="prose prose-sm max-w-none dark:prose-invert">
-                    {message.parts?.map((part, index) => (
-                      part.type === "text" ? (
-                        <ReactMarkdown key={index}>
-                          {part.text}
-                        </ReactMarkdown>
-                      ) : null
-                    ))}
-                  </div>
-                </MessageContent>
-              </Message>
-            ))
+            messages.map((message) => {
+              // Extract text from parts array or use content directly
+              let messageText = '';
+              if (Array.isArray((message as any).parts)) {
+                const textParts = (message as any).parts
+                  .filter((p: any) => p.type === 'text')
+                  .map((p: any) => p.text)
+                  .join('');
+                messageText = textParts;
+              } else if (typeof (message as any).content === 'string') {
+                messageText = (message as any).content;
+              }
+
+              return (
+                <Message key={message.id} from={message.role}>
+                  <MessageContent>
+                    <div className="prose prose-sm max-w-none dark:prose-invert">
+                      <ReactMarkdown>
+                        {messageText}
+                      </ReactMarkdown>
+                    </div>
+                  </MessageContent>
+                </Message>
+              );
+            })
           )}
           {isLoading && (
             <Message from="assistant">
@@ -169,6 +150,7 @@ export default function Home() {
         <ModelSelector
           onModelChange={handleModelChange}
           disabled={isLoading}
+          lockedModel={lockedModel}
         />
       </div>
     </div>

@@ -9,20 +9,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export type AIModel = "gemini-2.5-flash" | "gemini-2.5-pro" | "gpt-5";
+export type AIModel = "gemini-2.5-flash" | "gpt-5-mini" | "gemini-2.5-pro" | "gpt-5";
 
 interface ModelSelectorProps {
   onModelChange: (model: AIModel) => void;
   disabled?: boolean;
+  lockedModel?: AIModel | null;
 }
 
 const models = [
   { id: "gemini-2.5-flash" as const, name: "Gemini 2.5 Flash" },
+  { id: "gpt-5-mini" as const, name: "OpenAI GPT-5 Mini" },
   { id: "gemini-2.5-pro" as const, name: "Gemini 2.5 Pro" },
   { id: "gpt-5" as const, name: "OpenAI GPT-5" },
 ];
 
-export function ModelSelector({ onModelChange, disabled }: ModelSelectorProps) {
+export function ModelSelector({ onModelChange, disabled, lockedModel }: ModelSelectorProps) {
   const [selectedModel, setSelectedModel] = useState<AIModel>("gemini-2.5-flash");
 
   const handleModelChange = (value: string) => {
@@ -30,6 +32,11 @@ export function ModelSelector({ onModelChange, disabled }: ModelSelectorProps) {
     setSelectedModel(model);
     onModelChange(model);
   };
+
+  // If a locked model is specified, don't render the selector
+  if (lockedModel) {
+    return null;
+  }
 
   return (
     <Select
