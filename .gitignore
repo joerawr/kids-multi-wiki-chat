@@ -69,3 +69,8 @@ fixing_minecraft_mcp_and_adding_memory.txt
 
 # Claude export files
 *.txt
+
+# Local K8s configs and secrets
+k8s/
+docker.md
+deployment_learnings.md
