@@ -81,10 +81,9 @@ test_image_exists() {
 test_container_startup() {
     print_test "Container startup"
 
-    # Start container
+    # Start container (NEXT_PUBLIC_LOCKED_MODEL is baked into build)
     if docker run -d --name $CONTAINER_NAME \
         -p $TEST_PORT:3000 \
-        -e NEXT_PUBLIC_LOCKED_MODEL=$LOCKED_MODEL \
         $IMAGE_NAME > /dev/null 2>&1; then
 
         # Wait for container to be ready
@@ -131,15 +130,16 @@ test_homepage_loading() {
 test_locked_model() {
     print_test "Locked model configuration"
 
-    # Check that model selector is hidden (no "Model" text in select elements)
+    # Check that model selector is hidden when model is locked
     local response=$(curl -f -s http://localhost:$TEST_PORT/ 2>/dev/null)
     if [ $? -eq 0 ]; then
-        # Look for model selector dropdown - should not be present when locked
-        if echo "$response" | grep -q "data-slot=\"select-trigger\"" && ! echo "$response" | grep -q "gemini-2.5-flash.*gemini-2.5-pro"; then
+        # Model selector should NOT have multiple model options visible
+        # Look for the presence of model selection UI (gemini-2.5-pro, gpt-5, etc.)
+        if ! echo "$response" | grep -qi "gemini-2.5-pro" && ! echo "$response" | grep -qi "gpt-5"; then
             pass_test "Locked model configuration"
             return 0
         else
-            fail_test "Locked model configuration" "Model selector appears to be visible or unlocked"
+            fail_test "Locked model configuration" "Model selector appears to be visible (found multiple model options)"
             return 1
         fi
     else

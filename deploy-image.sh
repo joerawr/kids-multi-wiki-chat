@@ -76,7 +76,9 @@ build_image() {
         return 0
     fi
 
-    docker build -t "$versioned_tag" .
+    docker build \
+        --build-arg NEXT_PUBLIC_LOCKED_MODEL=gemini-2.5-flash \
+        -t "$versioned_tag" .
 
     if [ "$TAG_LATEST" = "true" ]; then
         log_info "Tagging as latest"

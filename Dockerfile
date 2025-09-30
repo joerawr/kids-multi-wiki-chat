@@ -65,6 +65,9 @@ RUN wikipedia/venv/bin/pip install wikipedia-mcp
 #################################################################
 FROM base AS app-builder
 
+# Accept build argument for locked model
+ARG NEXT_PUBLIC_LOCKED_MODEL
+
 WORKDIR /app
 
 # Copy package files

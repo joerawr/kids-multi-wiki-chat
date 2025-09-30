@@ -350,7 +350,7 @@ The Dockerfile uses a 3-stage build process optimized for production:
 - **PATCH** (`x.x.1` → `x.x.2`): Bug fixes and small improvements
   - Examples: Fix broken links, performance improvements, dependency updates
 
-**Current Version**: `v1.1.0` (features: streaming responses, model locking, Gemini 2.5 Flash preview)
+**Current Version**: `v1.1.1` (fix: model locking now baked into Docker build)
 
 **Alternative Tagging**:
 - **Date-based**: `2024.01.15`, `2024.01.15-hotfix`
