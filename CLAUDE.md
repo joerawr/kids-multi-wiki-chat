@@ -337,8 +337,22 @@ The Dockerfile uses a 3-stage build process optimized for production:
 - **Manual rollback**: `kubectl rollout undo deployment/wiki-chat -n knowledge-quest`
 - **Specific version**: `kubectl set image deployment/wiki-chat wiki-chat=ghcr.io/joerawr/kids-multi-wiki-chat:v1.2.2 -n knowledge-quest`
 
-#### **Version Tagging Examples**
-- **Semantic versioning**: `v1.2.3`, `v2.0.0`
+#### **Version Tagging Strategy**
+
+**Semantic Versioning (Recommended)**: `MAJOR.MINOR.PATCH`
+
+- **MAJOR** (`1.x.x` → `2.x.x`): Breaking changes, API changes, major rewrites
+  - Examples: New authentication system, UI redesign, API endpoint changes
+
+- **MINOR** (`x.1.x` → `x.2.x`): New features that are backward compatible
+  - Examples: New wiki sources, new AI models, streaming features, model locking
+
+- **PATCH** (`x.x.1` → `x.x.2`): Bug fixes and small improvements
+  - Examples: Fix broken links, performance improvements, dependency updates
+
+**Current Version**: `v1.1.0` (features: streaming responses, model locking, Gemini 2.5 Flash preview)
+
+**Alternative Tagging**:
 - **Date-based**: `2024.01.15`, `2024.01.15-hotfix`
 - **Build numbers**: `build-123`, `release-456`
 
