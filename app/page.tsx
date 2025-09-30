@@ -33,9 +33,7 @@ export default function Home() {
     lockedModel || "gemini-2.5-flash"
   );
 
-  const { messages, status, sendMessage } = useChat({
-    api: "/api/chat",
-  });
+  const { messages, status, sendMessage } = useChat();
 
   const handleSubmit = async (
     message: { text?: string; files?: any[] },
