@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: knowledgequest
+  labels:
+    app: knowledgequest
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: knowledgequest
+  template:
+    metadata:
+      labels:
+        app: knowledgequest
+    spec:
+      containers:
+      - name: knowledgequest
+        image: traefik/knowledgequest
+        ports:
+        - containerPort: 80

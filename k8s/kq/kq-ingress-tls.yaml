@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: knowledgequest-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+spec:
+  tls:
+  - hosts:
+    - knowledgequest.${DOMAIN}
+    secretName: knowledgequest-tls
+  rules:
+  - host: knowledgequest.${DOMAIN}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: wiki-chat-service 
+            port:
+              number: 80

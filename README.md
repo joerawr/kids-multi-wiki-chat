@@ -150,6 +150,90 @@ Optional (for future extensions): Docker, git, and familiarity with MCP protocol
 
 ---
 
+## Kubernetes Deployment (k3s)
+
+For production deployment on k3s with HTTPS certificates:
+
+### Prerequisites
+
+#### Network Setup (Home Router)
+For HTTPS certificate generation, you need to temporarily forward HTTP traffic:
+1. **During certificate setup**: Forward port 80 → k3s cluster IP (for Let's Encrypt HTTP-01 challenge)
+2. **After certificates are issued**:
+   - Forward port 443 → k3s cluster IP (for HTTPS traffic)
+   - **Close port 80** for security (optional, but recommended)
+
+#### Kubernetes Setup
+1. **Install cert-manager**:
+   ```bash
+   kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.18.2/cert-manager.yaml
+   ```
+
+2. **Wait for cert-manager to be ready**:
+   ```bash
+   kubectl wait --for=condition=ready pod -l app=cert-manager -n cert-manager --timeout=60s
+   kubectl wait --for=condition=ready pod -l app=cainjector -n cert-manager --timeout=60s
+   kubectl wait --for=condition=ready pod -l app=webhook -n cert-manager --timeout=60s
+   ```
+
+### Deployment Steps
+
+1. **Set up environment variables**:
+   ```bash
+   cp k8s/setup-env.sh k8s/setup-env.local.sh
+   # Edit k8s/setup-env.local.sh with your actual email and domain
+   source k8s/setup-env.local.sh
+   ```
+
+2. **Deploy Let's Encrypt ClusterIssuer**:
+   ```bash
+   cat k8s/letsencrypt-prod.yaml | envsubst | kubectl apply -f -
+   ```
+
+3. **Deploy HTTPS redirect middleware**:
+   ```bash
+   cat k8s/traefik-https-redirect-middleware.yaml | envsubst | kubectl apply -f -
+   ```
+
+4. **Deploy whoami test app** (optional):
+   ```bash
+   kubectl apply -f k8s/whoami/whoami-deployment.yaml
+   kubectl apply -f k8s/whoami/whoami-service.yaml
+   cat k8s/whoami/whoami-ingress-tls.yaml | envsubst | kubectl apply -f -
+   ```
+
+5. **Verify certificate issuance**:
+   ```bash
+   kubectl get certificates
+   kubectl describe certificate whoami2-tls
+   kubectl get challenges  # Should be empty once successful
+   ```
+
+6. **Enable HTTPS redirect** (after certificate is issued):
+   ```bash
+   # Uncomment the middleware line in whoami-ingress-tls.yaml
+   # Then reapply the ingress
+   cat k8s/whoami/whoami-ingress-tls.yaml | envsubst | kubectl apply -f -
+   ```
+
+The whoami test app will be available at `https://whoami2.your-domain.com` once the certificate is issued.
+
+### Important Notes
+
+#### Certificate Generation Process
+- **HTTP-01 Challenge**: Let's Encrypt validates domain ownership by accessing `http://domain/.well-known/acme-challenge/token`
+- **Temporary HTTP access required**: Port 80 must be accessible during certificate generation
+- **No HTTPS redirects during setup**: The redirect middleware interferes with HTTP-01 challenges
+- **Automatic renewal**: cert-manager handles certificate renewals automatically
+
+#### Cloudflare Compatibility
+- **During certificate generation**: Turn OFF Cloudflare proxy (gray cloud) to allow direct access
+- **After certificate issued**: Can turn ON Cloudflare proxy (orange cloud) for additional protection
+- **SSL Mode**: Use "Full (strict)" in Cloudflare for best security
+- **Alternative**: Use Cloudflare API tokens with DNS-01 challenges (more complex setup)
+
+---
+
 ## Contributing & Feedback
 This project is still in its first iteration. Suggestions, bug reports, and family-friendly ideas are welcome—open an issue or send a pull request. If you’re running it with your kids, we’d love to hear what topics they explore next!
 
