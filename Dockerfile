@@ -123,6 +123,7 @@ RUN find . -name ".DS_Store" -delete && \
 
 # Create non-root user and set ownership efficiently
 RUN groupadd -r appuser && useradd -r -g appuser appuser && \
+    mkdir -p /app/.next/cache/images && \
     chown -R appuser:appuser /app/.next /app/app /app/components /app/lib && \
     chown appuser:appuser /app/package.json /app/next.config.ts
 USER appuser
