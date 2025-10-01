@@ -121,12 +121,10 @@ RUN find . -name ".DS_Store" -delete && \
     find . -name ".npm" -type d -exec rm -rf {} + 2>/dev/null || true && \
     find . -name ".cache" -type d -exec rm -rf {} + 2>/dev/null || true
 
-# Create non-root user and set ownership efficiently
-RUN groupadd -r appuser && useradd -r -g appuser appuser && \
-    mkdir -p /app/.next/cache/images && \
-    chown -R appuser:appuser /app/.next /app/app /app/components /app/lib && \
-    chown appuser:appuser /app/package.json /app/next.config.ts
-USER appuser
+# Set ownership for non-root node user (uid 1000 already exists in base image)
+RUN mkdir -p /app/.next/cache/images && \
+    chown -R node:node /app
+USER node
 
 # Expose port
 EXPOSE 3000
