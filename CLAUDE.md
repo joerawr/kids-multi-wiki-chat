@@ -170,8 +170,37 @@ Pass dynamic params (mcpServer, model) in the second argument to `sendMessage()`
 - **AI Elements**: Pre-built chat components in `components/ai-elements/`
 - Import aliases: `@/components`, `@/lib`, `@/app`
 
+## GitHub Issue Pattern
+
+When creating GitHub issues for this repository, use the following format:
+
+```
+## Problem
+[Clear problem statement]
+
+## Solution
+[Proposed fix or approach]
+
+## Rabbit holes
+[One line or short list of things or topics to avoid]
+
+## No gos
+[Things that should not be done, e.g., "Changing SDKs or anything that would trigger a 2.0.0 version"]
+```
+
+## Container Deployment (containerize branch)
+
+When applying fixes in the `containerize` branch:
+
+1. **Test before pushing**: Always test changes locally before pushing to the branch
+2. **Deploy and verify**: Deploy the container and verify it works before closing the issue
+3. **Check latest version**: Before deploying, check the latest version at https://github.com/users/joerawr/packages/container/package/kids-multi-wiki-chat
+4. **Deploy command**: Use `./deploy-image.sh <version>` with an incremented version number
+5. **Only then close issue**: After successful deployment and verification, push changes and close the issue
+
 ## Reference Links
 
 - AI SDK useChat: https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat
 - AI SDK streamText: https://ai-sdk.dev/docs/reference/ai-sdk-core/stream-text
 - MCP Protocol: https://modelcontextprotocol.io/
+- note the containerize branch is permanent and will not be merged to main.
